@@ -19,10 +19,12 @@ grp_general.add_argument('--log-level', type=str.upper, choices=['CRITICAL', 'ER
 grp_general.add_argument('--log-timestamp', action='store_true', help='Log timestamps to console')
 grp_general.add_argument('--log-file', help='Path to log file, disables console logging')
 
-subparsers = parser.add_subparsers(title='Commands', required=True)
+subparsers = parser.add_subparsers(title='Commands', dest='command')
+# 3.6 does not have the required argument
+subparsers.required = True
 
-parser_json = subparsers.add_parser('migrate', help='Migrate VMs')
-parser_json.set_defaults(func=launch_migrate)
+parser_migrate = subparsers.add_parser('migrate', help='Migrate VMs')
+parser_migrate.set_defaults(func=launch_migrate)
 
 
 def setup_logger(args: argparse.Namespace):
