@@ -1,0 +1,10 @@
+/.venv/
+/.idea/
+*.pyc
+/*.egg
+/*.egg-info
+/build/
+/dist/
+__pycache__
+.coverage
+coverage.xml

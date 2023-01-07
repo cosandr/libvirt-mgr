@@ -1,0 +1,38 @@
+# All hosts are part of this group by default
+[groups.live]
+# Flags used when migrating within this group
+# Defaults to ["persist_dest", "undefine_source", "live", "peer2peer", "tunneled"], equivalent to
+# virsh migrate --persistent --undefinesource --live --p2p --tunnelled
+same_group_flags = ["live"]  # Migrate using TCP
+# Flags used for hosts in different groups
+# Defaults to ["persist_dest", "undefine_source", "offline"], equivalent to
+# virsh migrate --persistent --undefinesource --offline
+different_group_flags = ["offline"]
+
+# Add a custom group
+[groups.offline]
+# All migrations from this group will be offline
+same_group_flags = ["persist_dest", "offline"]
+
+# Special entry for localhost
+[hosts.localhost]
+# Defaults to qemu:///system
+uri = "qemu:///session"
+
+# Automatically generates an SSH connection URI, using the key ("kvm01") as a hostname
+[hosts.kvm01]
+# URI becomes "qemu+ssh://root@kvm01/system?no_tty=1"
+group = "offline"  # Assign the offline group to this host
+
+[hosts.kvm02]
+address = "192.168.1.22"
+user = "myuser"
+port = 2200
+params = ["command=/opt/openssh/bin/ssh", "no_verify=1"]
+path = "user"
+# Resulting URI
+# qemu+ssh://myuser@192.168.1.22:2200/user?command=/opt/openssh/bin/ssh&no_verify=1
+
+[hosts.kvm03]
+# Custom URI
+uri = "qemu+tls://192.168.1.23:5000/system?pkipath=/tmp/pki/client"
