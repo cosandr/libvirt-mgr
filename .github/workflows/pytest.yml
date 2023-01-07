@@ -1,0 +1,33 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+
+    # latest doesn't have Python 3.6
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends libvirt-dev
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r test/requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov --cov-report=xml --cov-report=html
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: junit/test-results-${{ matrix.python-version }}.xml
+        if: ${{ always() }}
