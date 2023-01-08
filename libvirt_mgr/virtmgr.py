@@ -25,6 +25,17 @@ subparsers.required = True
 
 parser_migrate = subparsers.add_parser('migrate', help='Migrate VMs')
 parser_migrate.set_defaults(func=launch_migrate)
+parser_migrate.add_argument('-s', '--src-host', default='localhost', help='Host to migrate from')
+parser_migrate.add_argument('--no-start', action='store_true', help='Do not automatically start domain after offline migrations')
+parser_migrate.add_argument('--no-stop', action='store_true', help='Do not automatically shutdown running domains for offline migrations')
+
+migrate_names_grp = parser_migrate.add_mutually_exclusive_group(required=True)
+migrate_names_grp.add_argument('-n', '--name', help='Comma separated list of VMs to migrate')
+migrate_names_grp.add_argument('-a', '--all', action='store_true', help='Migrate all VMs on source host')
+
+migrate_target_grp = parser_migrate.add_mutually_exclusive_group(required=True)
+migrate_target_grp.add_argument('-t', '--dst-host', help='Host to migrate to')
+migrate_target_grp.add_argument('-g', '--dst-group', help='Group to migrate to, automatically picks a host')
 
 
 def setup_logger(args: argparse.Namespace):
@@ -54,7 +65,7 @@ def main():
     except Exception as e:
         logger.exception(e)
         raise SystemExit(1)
-    args.func(args)
+    args.func(args, config)
 
 
 if __name__ == '__main__':
